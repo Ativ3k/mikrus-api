@@ -1,5 +1,6 @@
 import { HttpClient } from "./http-client"
-import { Amfetamina, AmfetaminaError, isAmfetaminaError } from "./types/amfetamina.type"
+import { Amfetamina, AmfetaminaError } from "./types/amfetamina.type"
+import { Db, DbCredentials, DbType, MongoCredentials, parseDb, RawDb, RawDbError } from "./types/db.type"
 import { parseServerInfo, RawServerInfo, ServerInfo } from "./types/info.type"
 import { Log, parseLog, RawLog } from "./types/logs.type"
 import { parseSerwer, RawSerwer, Serwer } from "./types/serwery.type"
@@ -74,7 +75,7 @@ export class MikrusClient {
 
     async amfetamina() {
         const res = await this.http.post<Amfetamina | AmfetaminaError>("/amfetamina")
-        if (isAmfetaminaError(res)) throw new Error(res.error)
+        if ("error" in res) throw new Error(res.error)
         return res;
     }
 
@@ -83,4 +84,35 @@ export class MikrusClient {
         if (res.startsWith('error')) throw new Error(res.split('=')[1])
         return res;
     }
+
+    // -------------- DB --------------
+
+    async db(): Promise<Db> {
+        const res = await this.http.post<RawDb | RawDbError>("/db")
+        if ("error" in res) throw new Error(res.error)
+        return parseDb(res)
+    }
+
+    async dbByType(type: DbType): Promise<MongoCredentials | DbCredentials> {
+        const res = await this.http.post<RawDb | RawDbError>("/db")
+        if ("error" in res) throw new Error(res.error)
+        return parseDb(res)[type]
+    }
+
+    async dbByTypeRaw(type: DbType) {
+        const res = await this.http.post<RawDb | RawDbError>("/db")
+        if ("error" in res) throw new Error(res.error)
+        return res[type];
+    }
+
+    async dbRaw(): Promise<RawDb> {
+        const res = await this.http.post<RawDb | RawDbError>("/db")
+        if ("error" in res) throw new Error(res.error)
+        return res;
+    }
+
+    async dbBash(): Promise<string> {
+        return this.http.postBash("/db.bash")
+    }
+
 }

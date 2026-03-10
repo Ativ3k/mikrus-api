@@ -6,8 +6,3 @@ export interface Amfetamina {
 export interface AmfetaminaError {
     error: string
 }
-
-
-export function isAmfetaminaError(res: Amfetamina | AmfetaminaError): res is AmfetaminaError {
-    return "error" in res
-}
