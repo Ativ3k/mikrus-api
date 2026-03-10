@@ -16,11 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
-
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
@@ -29,4 +24,6 @@ jobs:
         run: bun run build
 
       - name: Publish
-        run: npm publish --provenance --access public
+        run: bun publish -p --access public
+        env:
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
