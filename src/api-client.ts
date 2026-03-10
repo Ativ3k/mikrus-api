@@ -1,3 +1,4 @@
+import { MikrusEndpoints } from "./enums/endpoints.enum"
 import { HttpClient } from "./http-client"
 import { Amfetamina, AmfetaminaResponse } from "./types/amfetamina.type"
 import { Db, DbCredentials, DbType, MongoCredentials, parseDb, RawDb, RawDbResponse } from "./types/db.type"
@@ -31,7 +32,7 @@ export class MikrusClient {
     * @cache 60s
     */
     async info(): Promise<ServerInfo> {
-        const raw = await this.http.post<RawServerInfo>("/info")
+        const raw = await this.http.post<RawServerInfo>(MikrusEndpoints.INFO)
         return parseServerInfo(raw)
     }
 
@@ -39,14 +40,14 @@ export class MikrusClient {
     * @cache 60s
     */
     async infoRaw(): Promise<RawServerInfo> {
-        return this.http.post<RawServerInfo>("/info")
+        return this.http.post<RawServerInfo>(MikrusEndpoints.INFO)
     }
 
     /** Returns server information as bash environment variables. 
     * @cache 60s
     */
     async infoBash(): Promise<string> {
-        return this.http.postBash("/info.bash")
+        return this.http.postBash(`${MikrusEndpoints.INFO}.bash`)
     }
 
     // -------------- SERWERY --------------
@@ -55,7 +56,7 @@ export class MikrusClient {
     * @cache 60s
     */
     async serwery(): Promise<Serwer[]> {
-        const raw = await this.http.post<RawSerwer[]>('/serwery')
+        const raw = await this.http.post<RawSerwer[]>(MikrusEndpoints.SERWERY)
         return raw.map(parseSerwer)
     }
 
@@ -63,14 +64,14 @@ export class MikrusClient {
     * @cache 60s
     */
     async serweryRaw(): Promise<RawSerwer[]> {
-        return this.http.post<RawSerwer[]>('/serwery')
+        return this.http.post<RawSerwer[]>(MikrusEndpoints.SERWERY)
     }
 
     /** Returns server list as bash environment variables. 
     * @cache 60s
     */
     async serweryBash(): Promise<string> {
-        return this.http.postBash("/serwery.bash")
+        return this.http.postBash(`${MikrusEndpoints.SERWERY}.bash`)
     }
 
     // -------------- RESTART --------------
@@ -80,7 +81,7 @@ export class MikrusClient {
     * @throws {Error} If the restart is unavailable
     */
     async restart(): Promise<Restart> {
-        const res = await this.http.post<RestartResponse>('/restart')
+        const res = await this.http.post<RestartResponse>(MikrusEndpoints.RESTART)
         if ("error" in res) throw new Error(res.error)
         return res;
     }
@@ -89,18 +90,18 @@ export class MikrusClient {
 
     /** Returns the last 10 task log entries (reinstall, marian etc.). */
     async logs(): Promise<Log[]> {
-        const raw = await this.http.post<RawLog[]>("/logs")
+        const raw = await this.http.post<RawLog[]>(MikrusEndpoints.LOGS)
         return raw.map(parseLog)
     }
 
     /** Returns raw logs without parsing. */
     async logsRaw(): Promise<RawLog[]> {
-        return this.http.post<RawLog[]>("/logs")
+        return this.http.post<RawLog[]>(MikrusEndpoints.LOGS)
     }
 
     /** Returns logs as bash environment variables. */
     async logsBash(): Promise<string> {
-        return this.http.postBash('/logs.bash')
+        return this.http.postBash(`${MikrusEndpoints.LOGS}.bash`)
     }
 
     /**
@@ -108,7 +109,7 @@ export class MikrusClient {
      * @param id - Log entry ID from the logs list
      */
     async logsById(id: number | string): Promise<Log> {
-        const raw = await this.http.post<RawLog>(`/logs/${id}`)
+        const raw = await this.http.post<RawLog>(`${MikrusEndpoints.LOGS}/${id}`)
         return parseLog(raw)
     }
 
@@ -117,7 +118,7 @@ export class MikrusClient {
      * @param id - Log entry ID from the logs list
      */
     async logsByIdRaw(id: number | string): Promise<RawLog> {
-        return this.http.post<RawLog>(`/logs/${id}`)
+        return this.http.post<RawLog>(`${MikrusEndpoints.LOGS}/${id}`)
     }
 
     // -------------- AMFETAMINA --------------
@@ -127,7 +128,7 @@ export class MikrusClient {
     * @throws {Error} If the cooldown has not passed
     */
     async amfetamina(): Promise<Amfetamina> {
-        const res = await this.http.post<AmfetaminaResponse>("/amfetamina")
+        const res = await this.http.post<AmfetaminaResponse>(MikrusEndpoints.AMFETAMINA)
         if ("error" in res) throw new Error(res.error)
         return res;
     }
@@ -137,7 +138,7 @@ export class MikrusClient {
     * @throws {Error} If the cooldown has not passed
     */
     async amfetaminaBash(): Promise<string> {
-        const res = await this.http.postBash("/amfetamina.bash")
+        const res = await this.http.postBash(`${MikrusEndpoints.AMFETAMINA}.bash`)
         if (res.startsWith('error')) throw new Error(res.split('=')[1])
         return res;
     }
@@ -192,7 +193,7 @@ export class MikrusClient {
      * @cache 60s
      */
     async dbBash(): Promise<string> {
-        return this.http.postBash("/db.bash")
+        return this.http.postBash(`${MikrusEndpoints.DB}.bash`)
     }
 
     // -------------- EXEC --------------
@@ -203,7 +204,7 @@ export class MikrusClient {
     * @throws {Error} If the command exceeds the 60s timeout
     */
     async exec(cmd: string): Promise<Exec> {
-        return this.http.post<Exec>("/exec", { cmd })
+        return this.http.post<Exec>(MikrusEndpoints.EXEC, { cmd })
     }
 
     // -------------- STATS --------------
@@ -212,7 +213,7 @@ export class MikrusClient {
     * @cache 60s
     */
     async stats(): Promise<Stats> {
-        const res = await this.http.post<StatsRaw>("/stats")
+        const res = await this.http.post<StatsRaw>(MikrusEndpoints.STATS)
         return parseStats(res)
     }
 
@@ -220,7 +221,7 @@ export class MikrusClient {
     * @cache 60s
     */
     async statsRaw(): Promise<StatsRaw> {
-        return this.http.post<StatsRaw>("/stats")
+        return this.http.post<StatsRaw>(MikrusEndpoints.STATS)
     }
 
     // -------------- PORTY --------------
@@ -229,14 +230,14 @@ export class MikrusClient {
     * @cache 60s
     */
     async porty(): Promise<number[]> {
-        return this.http.post<number[]>("/porty")
+        return this.http.post<number[]>(MikrusEndpoints.PORTY)
     }
 
     /** Returns assigned ports as bash environment variables. 
     * @cache 60s
     */
     async portyBash(): Promise<string> {
-        return this.http.postBash("/porty.bash")
+        return this.http.postBash(`${MikrusEndpoints.PORTY}.bash`)
     }
 
     // -------------- CLOUD --------------
@@ -248,7 +249,7 @@ export class MikrusClient {
 
     /** Returns a list of domains assigned to the server. */
     async domain(): Promise<Domain[]> {
-        return this.http.post("/domain")
+        return this.http.post(MikrusEndpoints.DOMAIN)
     }
 
     /**
@@ -258,16 +259,16 @@ export class MikrusClient {
      * @throws {Error} If the domain name is invalid
      */
     async domainNew(port: number, domain = '-'): Promise<DomainNew> {
-        const res = await this.http.post<DomainResponse>("/domain", { port, domain })
+        const res = await this.http.post<DomainResponse>(MikrusEndpoints.DOMAIN, { port, domain })
         if ("error" in res) throw new Error(res.error)
-        if (Array.isArray(res)) throw new Error("Unexpected array response from /domain")
+        if (Array.isArray(res)) throw new Error(`Unexpected array response from ${MikrusEndpoints.DOMAIN}`)
         return res
     }
 
     // -------------- PRIVATE --------------
 
     private async fetchDb(): Promise<RawDb> {
-        const res = await this.http.post<RawDbResponse>("/db")
+        const res = await this.http.post<RawDbResponse>(MikrusEndpoints.DB)
         if ("error" in res) throw new Error(res.error)
         return res
     }
