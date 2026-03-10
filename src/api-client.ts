@@ -139,4 +139,14 @@ export class MikrusClient {
         return this.http.post<StatsRaw>("/stats")
     }
 
+    // -------------- PORTY --------------
+
+    async porty(): Promise<number[]> {
+        return this.http.post<number[]>("/porty")
+    }
+
+    async portyBash(): Promise<string> {
+        return this.http.postBash("/porty.bash")
+    }
+
 }
