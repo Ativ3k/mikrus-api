@@ -1,6 +1,7 @@
 import { HttpClient } from "./http-client"
 import { Amfetamina, AmfetaminaError } from "./types/amfetamina.type"
 import { Db, DbCredentials, DbType, MongoCredentials, parseDb, RawDb, RawDbError } from "./types/db.type"
+import { Exec } from "./types/exec.type"
 import { parseServerInfo, RawServerInfo, ServerInfo } from "./types/info.type"
 import { Log, parseLog, RawLog } from "./types/logs.type"
 import { parseSerwer, RawSerwer, Serwer } from "./types/serwery.type"
@@ -113,6 +114,12 @@ export class MikrusClient {
 
     async dbBash(): Promise<string> {
         return this.http.postBash("/db.bash")
+    }
+
+    // -------------- EXEC --------------
+
+    async exec(cmd: string): Promise<Exec> {
+        return this.http.post<Exec>("/exec", { cmd })
     }
 
 }

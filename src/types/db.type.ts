@@ -1,4 +1,9 @@
-export type DbType = "psql" | "mongo" | "mysql"
+export enum DbTypeEnum {
+    PSQL = 'psql',
+    MONGO = 'mongo',
+    MYSQL = 'mysql'
+}
+export type DbType = "psql" | "mongo" | "mysql" | DbTypeEnum
 
 export interface RawDb extends Record<DbType, string> { }
 
