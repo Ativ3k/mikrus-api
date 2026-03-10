@@ -1,12 +1,13 @@
 {
 	"name": "mikrus-api",
-	"version": "0.9.0",
-	"description": "Zero dependency API wrapper for mikr.us API",
+	"version": "1.0.0",
+	"description": "Lightweight API wrapper for mikr.us",
 	"keywords": [
 		"mikrus-api",
 		"mikrus-wrapper",
 		"mikrus-sdk"
 	],
+	"author": "Ativ3k",
 	"license": "MIT",
 	"homepage": "https://github.com/Ativ3k/mikrus-api",
 	"repository": {
@@ -28,13 +29,16 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "tsc",
-		"prepublishOnly": "npm run build"
+		"build:js": "bun build src/index.ts --outdir dist --format esm && bun build src/index.ts --outfile dist/index.cjs --format cjs",
+		"build:types": "tsc --emitDeclarationOnly --declaration --outDir dist",
+		"build": "bun run build:js && bun run build:types",
+		"prepublish": "bun run build"
 	},
 	"engines": {
 		"node": ">=20"
 	},
 	"devDependencies": {
-		"@types/node": "^25.4.0"
+		"@types/node": "^25.4.0",
+		"typescript": "^5.9.3"
 	}
 }
