@@ -1,6 +1,7 @@
 import { HttpClient } from "./http-client"
 import { Amfetamina, AmfetaminaError } from "./types/amfetamina.type"
 import { Db, DbCredentials, DbType, MongoCredentials, parseDb, RawDb, RawDbError } from "./types/db.type"
+import { DomainNew, DomainNewError } from "./types/domain.type"
 import { Exec } from "./types/exec.type"
 import { parseServerInfo, RawServerInfo, ServerInfo } from "./types/info.type"
 import { Log, parseLog, RawLog } from "./types/logs.type"
@@ -147,6 +148,23 @@ export class MikrusClient {
 
     async portyBash(): Promise<string> {
         return this.http.postBash("/porty.bash")
+    }
+
+
+    // -------------- CLOUD --------------
+
+    // TODO
+
+
+    // -------------- DOMAIN --------------
+    async domain(): Promise<number[]> {
+        return this.http.post<number[]>("/domain")
+    }
+
+    async domainNew(port: number, domain = '-') {
+        const res = await this.http.post<DomainNew | DomainNewError>("/domain", { port, domain })
+        if ("error" in res) throw new Error(res.error)
+        return res;
     }
 
 }
