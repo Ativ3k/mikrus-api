@@ -1,4 +1,5 @@
 import { HttpClient } from "./http-client"
+import { Amfetamina, AmfetaminaError, isAmfetaminaError } from "./types/amfetamina.type"
 import { parseServerInfo, RawServerInfo, ServerInfo } from "./types/info.type"
 import { Log, parseLog, RawLog } from "./types/logs.type"
 import { parseSerwer, RawSerwer, Serwer } from "./types/serwery.type"
@@ -69,4 +70,17 @@ export class MikrusClient {
         return this.http.post<RawLog>(`/logs/${id}`)
     }
 
+    // -------------- AMFETAMINA --------------
+
+    async amfetamina() {
+        const res = await this.http.post<Amfetamina | AmfetaminaError>("/amfetamina")
+        if (isAmfetaminaError(res)) throw new Error(res.error)
+        return res;
+    }
+
+    async amfetaminaBash() {
+        const res = await this.http.postBash("/amfetamina.bash")
+        if (res.startsWith('error')) throw new Error(res.split('=')[1])
+        return res;
+    }
 }
