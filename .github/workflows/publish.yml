@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*.*.*'
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -16,10 +20,13 @@ jobs:
         with:
           bun-version: latest
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
       - name: Build
         run: bun run build
 
       - name: Publish
-        run: bun publish --access public
-        env:
-          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --provenance
