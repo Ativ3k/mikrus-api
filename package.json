@@ -1,6 +1,6 @@
 {
 	"name": "mikrus-api",
-	"version": "0.5.0",
+	"version": "0.7.0",
 	"description": "Zero dependency API wrapper for mikr.us API",
 	"keywords": [
 		"mikrus-api",

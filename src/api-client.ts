@@ -4,6 +4,7 @@ import { Db, DbCredentials, DbType, MongoCredentials, parseDb, RawDb, RawDbError
 import { Exec } from "./types/exec.type"
 import { parseServerInfo, RawServerInfo, ServerInfo } from "./types/info.type"
 import { Log, parseLog, RawLog } from "./types/logs.type"
+import { Restart, RestartError } from "./types/restart.type"
 import { parseSerwer, RawSerwer, Serwer } from "./types/serwery.type"
 
 export class MikrusClient {
@@ -46,7 +47,11 @@ export class MikrusClient {
     }
 
     // -------------- RESTART --------------
-    // todo
+    async restart() {
+        const res = await this.http.post<Restart | RestartError>('/restart')
+        if ("error" in res) throw new Error(res.error)
+        return res;
+    }
 
     // -------------- LOGS --------------
 
