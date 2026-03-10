@@ -6,6 +6,7 @@ import { parseServerInfo, RawServerInfo, ServerInfo } from "./types/info.type"
 import { Log, parseLog, RawLog } from "./types/logs.type"
 import { Restart, RestartError } from "./types/restart.type"
 import { parseSerwer, RawSerwer, Serwer } from "./types/serwery.type"
+import { parseStats, Stats, StatsRaw } from "./types/stats.type"
 
 export class MikrusClient {
     private readonly http: HttpClient
@@ -47,7 +48,7 @@ export class MikrusClient {
     }
 
     // -------------- RESTART --------------
-    async restart() {
+    async restart(): Promise<Restart> {
         const res = await this.http.post<Restart | RestartError>('/restart')
         if ("error" in res) throw new Error(res.error)
         return res;
@@ -64,7 +65,7 @@ export class MikrusClient {
         return this.http.post<RawLog[]>("/logs")
     }
 
-    async logsBash() {
+    async logsBash(): Promise<string> {
         return this.http.postBash('/logs.bash')
     }
 
@@ -79,13 +80,13 @@ export class MikrusClient {
 
     // -------------- AMFETAMINA --------------
 
-    async amfetamina() {
+    async amfetamina(): Promise<Amfetamina> {
         const res = await this.http.post<Amfetamina | AmfetaminaError>("/amfetamina")
         if ("error" in res) throw new Error(res.error)
         return res;
     }
 
-    async amfetaminaBash() {
+    async amfetaminaBash(): Promise<string> {
         const res = await this.http.postBash("/amfetamina.bash")
         if (res.startsWith('error')) throw new Error(res.split('=')[1])
         return res;
@@ -105,7 +106,7 @@ export class MikrusClient {
         return parseDb(res)[type]
     }
 
-    async dbByTypeRaw(type: DbType) {
+    async dbByTypeRaw(type: DbType): Promise<string> {
         const res = await this.http.post<RawDb | RawDbError>("/db")
         if ("error" in res) throw new Error(res.error)
         return res[type];
@@ -125,6 +126,17 @@ export class MikrusClient {
 
     async exec(cmd: string): Promise<Exec> {
         return this.http.post<Exec>("/exec", { cmd })
+    }
+
+    // -------------- STATS --------------
+
+    async stats(): Promise<Stats> {
+        const res = await this.http.post<StatsRaw>("/stats")
+        return parseStats(res)
+    }
+
+    async statsRaw(): Promise<StatsRaw> {
+        return this.http.post<StatsRaw>("/stats")
     }
 
 }
