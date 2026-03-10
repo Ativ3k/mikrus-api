@@ -6,3 +6,6 @@ export interface Restart {
 export interface RestartError {
     error: string
 }
+
+
+export type RestartResponse = Restart | RestartError

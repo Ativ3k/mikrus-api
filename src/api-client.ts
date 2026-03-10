@@ -1,11 +1,11 @@
 import { HttpClient } from "./http-client"
-import { Amfetamina, AmfetaminaError } from "./types/amfetamina.type"
-import { Db, DbCredentials, DbType, MongoCredentials, parseDb, RawDb, RawDbError } from "./types/db.type"
-import { DomainNew, DomainNewError } from "./types/domain.type"
+import { Amfetamina, AmfetaminaResponse } from "./types/amfetamina.type"
+import { Db, DbCredentials, DbType, MongoCredentials, parseDb, RawDb, RawDbResponse } from "./types/db.type"
+import { Domain, DomainNew, DomainResponse } from "./types/domain.type"
 import { Exec } from "./types/exec.type"
 import { parseServerInfo, RawServerInfo, ServerInfo } from "./types/info.type"
 import { Log, parseLog, RawLog } from "./types/logs.type"
-import { Restart, RestartError } from "./types/restart.type"
+import { Restart, RestartResponse } from "./types/restart.type"
 import { parseSerwer, RawSerwer, Serwer } from "./types/serwery.type"
 import { parseStats, Stats, StatsRaw } from "./types/stats.type"
 
@@ -80,7 +80,7 @@ export class MikrusClient {
     * @throws {Error} If the restart is unavailable
     */
     async restart(): Promise<Restart> {
-        const res = await this.http.post<Restart | RestartError>('/restart')
+        const res = await this.http.post<RestartResponse>('/restart')
         if ("error" in res) throw new Error(res.error)
         return res;
     }
@@ -127,7 +127,7 @@ export class MikrusClient {
     * @throws {Error} If the cooldown has not passed
     */
     async amfetamina(): Promise<Amfetamina> {
-        const res = await this.http.post<Amfetamina | AmfetaminaError>("/amfetamina")
+        const res = await this.http.post<AmfetaminaResponse>("/amfetamina")
         if ("error" in res) throw new Error(res.error)
         return res;
     }
@@ -141,6 +141,7 @@ export class MikrusClient {
         if (res.startsWith('error')) throw new Error(res.split('=')[1])
         return res;
     }
+
     // -------------- DB --------------
 
     /**
@@ -150,22 +151,18 @@ export class MikrusClient {
      * @cache 60s
      */
     async db(): Promise<Db> {
-        const res = await this.http.post<RawDb | RawDbError>("/db")
-        if ("error" in res) throw new Error(res.error)
-        return parseDb(res)
+        return parseDb(await this.fetchDb())
     }
 
     /**
      * Returns access credentials for a specific database type.
-     * @param DbType - Database type: "psql" | "mysql" | "mongo"
+     * @param type - Database type: "psql" | "mysql" | "mongo"
      * @returns Parsed credentials for the specified database type
      * @throws {Error} If the server has no databases assigned
      * @cache 60s
      */
     async dbByType(type: DbType): Promise<MongoCredentials | DbCredentials> {
-        const res = await this.http.post<RawDb | RawDbError>("/db")
-        if ("error" in res) throw new Error(res.error)
-        return parseDb(res)[type]
+        return parseDb(await this.fetchDb())[type]
     }
 
     /**
@@ -176,9 +173,7 @@ export class MikrusClient {
      * @cache 60s
      */
     async dbByTypeRaw(type: DbType): Promise<string> {
-        const res = await this.http.post<RawDb | RawDbError>("/db")
-        if ("error" in res) throw new Error(res.error)
-        return res[type];
+        return (await this.fetchDb())[type]
     }
 
     /**
@@ -188,9 +183,7 @@ export class MikrusClient {
      * @cache 60s
      */
     async dbRaw(): Promise<RawDb> {
-        const res = await this.http.post<RawDb | RawDbError>("/db")
-        if ("error" in res) throw new Error(res.error)
-        return res;
+        return this.fetchDb()
     }
 
     /**
@@ -254,8 +247,8 @@ export class MikrusClient {
     // -------------- DOMAIN --------------
 
     /** Returns a list of domains assigned to the server. */
-    async domain(): Promise<number[]> {
-        return this.http.post<number[]>("/domain")
+    async domain(): Promise<Domain[]> {
+        return this.http.post("/domain")
     }
 
     /**
@@ -264,10 +257,19 @@ export class MikrusClient {
      * @param domain - Full domain name (e.g. mydomain.tojest.dev) or "-" to auto-assign. Default: "-"
      * @throws {Error} If the domain name is invalid
      */
-    async domainNew(port: number, domain = '-') {
-        const res = await this.http.post<DomainNew | DomainNewError>("/domain", { port, domain })
+    async domainNew(port: number, domain = '-'): Promise<DomainNew> {
+        const res = await this.http.post<DomainResponse>("/domain", { port, domain })
         if ("error" in res) throw new Error(res.error)
-        return res;
+        if (Array.isArray(res)) throw new Error("Unexpected array response from /domain")
+        return res
+    }
+
+    // -------------- PRIVATE --------------
+
+    private async fetchDb(): Promise<RawDb> {
+        const res = await this.http.post<RawDbResponse>("/db")
+        if ("error" in res) throw new Error(res.error)
+        return res
     }
 
 }

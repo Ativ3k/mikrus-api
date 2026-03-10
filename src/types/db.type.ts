@@ -3,13 +3,16 @@ export enum DbTypeEnum {
     MONGO = 'mongo',
     MYSQL = 'mysql'
 }
-export type DbType = "psql" | "mongo" | "mysql" | DbTypeEnum
+
+export type DbType = `${DbTypeEnum}`
 
 export interface RawDb extends Record<DbType, string> { }
 
 export interface RawDbError {
     error: string
 }
+
+export type RawDbResponse = RawDb | RawDbError;
 
 export interface DbCredentials {
     host: string
@@ -28,11 +31,14 @@ export interface Db {
     mongo: MongoCredentials
 }
 
-function parsePsqlCredentials(raw: string): DbCredentials {
+function parseLines(raw: string): (prefix: string) => string {
     const lines = raw.split("\n").filter(Boolean)
-    const get = (prefix: string): string =>
+    return (prefix: string) =>
         lines.find(l => l.startsWith(prefix))?.split(": ")[1] ?? ""
+}
 
+function parsePsqlCredentials(raw: string): DbCredentials {
+    const get = parseLines(raw)
     return {
         host: get("Server"),
         login: get("login"),
@@ -42,10 +48,7 @@ function parsePsqlCredentials(raw: string): DbCredentials {
 }
 
 function parseMongoCredentials(raw: string): MongoCredentials {
-    const lines = raw.split("\n").filter(Boolean)
-    const get = (prefix: string): string =>
-        lines.find(l => l.startsWith(prefix))?.split(": ")[1] ?? ""
-
+    const get = parseLines(raw)
     return {
         host: get("Host"),
         login: get("Login"),

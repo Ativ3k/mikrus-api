@@ -6,3 +6,5 @@ export interface Amfetamina {
 export interface AmfetaminaError {
     error: string
 }
+
+export type AmfetaminaResponse = Amfetamina | AmfetaminaError
