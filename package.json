@@ -1,6 +1,6 @@
 {
 	"name": "mikrus-api",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Lightweight API wrapper for mikr.us",
 	"keywords": [
 		"mikrus-api",
