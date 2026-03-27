@@ -14,6 +14,9 @@
 		"type": "git",
 		"url": "https://github.com/Ativ3k/mikrus-api"
 	},
+	"bugs": {
+		"url": "https://github.com/Ativ3k/mikrus-api/issues"
+	},
 	"type": "module",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
@@ -35,7 +38,8 @@
 		"prepublish": "bun run build"
 	},
 	"engines": {
-		"node": ">=20"
+		"node": ">=20",
+		"bun": ">=1.0.0"
 	},
 	"devDependencies": {
 		"@types/node": "^25.4.0",

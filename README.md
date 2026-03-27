@@ -7,6 +7,8 @@ A lightweight TypeScript/JavaScript API wrapper for [mikr.us](https://mikr.us).
 ```bash
 npm install mikrus-api
 # or
+yarn add mikrus-api
+# or
 pnpm add mikrus-api
 # or
 bun add mikrus-api
@@ -109,10 +111,12 @@ await client.domainNew(3000, 'mydomain.tojest.dev'); // Assign a specific domain
 
 ## Build
 
+Required [bun](https://bun.com/).
+
 ```bash
 bun run build
 ```
 
 ## License
 
-MIT
+[MIT](https://github.com/Ativ3k/mikrus-api/blob/master/LICENSE)
